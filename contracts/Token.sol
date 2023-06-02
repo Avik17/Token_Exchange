@@ -10,11 +10,31 @@ contract Token{
 	uint256 public decimals=18;
 	uint256 public totalSupply ;// 1000000 x 10^18
 	mapping(address=>uint256) public balanceOf;
-	constructor(string memory _name,string memory _symbol,uint256 _totalSupply){
+	constructor(string memory _name,
+				string memory _symbol,
+		    	uint256 _totalSupply)
+	{
 		name=_name;
 		symbol=_symbol;
 		totalSupply=_totalSupply*(10**decimals);
 		balanceOf[msg.sender]=totalSupply;
+	}
+	event Transfer( address indexed from,
+		address indexed to,
+		uint256 value
+		);
+	function transfer(address to,uint256 value)
+	public
+	returns (bool success){
+		require(balanceOf[msg.sender]>=value);
+		require(to!=address(0));
+		balanceOf[msg.sender]=balanceOf[msg.sender] - value;
+		balanceOf[to]=balanceOf[to]+ value;
+		
+		emit Transfer(msg.sender,to,value); 
+		return true;
+
+	
 	}
 
 }

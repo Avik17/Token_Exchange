@@ -5,12 +5,15 @@ return ethers.utils.parseUnits(n.toString(),'ether');
 }
 
 describe('Token',()=>{
-	let token,accounts,deployer
+	let token,accounts,deployer,reciever
 	beforeEach(async()=>{
 		const Token = await ethers.getContractFactory('Token');
-		 token = await Token.deploy('AVINASH','AVI','1000000');
+		 token = await Token.deploy('AVINASH',
+		 							'AVI',
+		 							'1000000');
 		 accounts=await ethers.getSigners()
 		 deployer =accounts[0]
+		 reciever=accounts[1]
 	})
 	describe('Deployment',()=>{
 		const name='AVINASH'
@@ -40,6 +43,50 @@ describe('Token',()=>{
 		 })
 
 	})
+describe('Success',()=>{
+describe('Sending Token',()=>{
+		let  amount,transaction,result
+		beforeEach(async()=>{
+		amount=tokens(100);
+		transaction=await token.connect(deployer).transfer(reciever.address,amount)
+		result=await transaction.wait()
+		});
+	
+				
+		it('Transfer Token balances',async ()=>{
+
+		expect(await token.balanceOf(deployer.address)).to.equal(tokens(999900))
+		expect(await token.balanceOf(reciever.address)).to.equal(amount)
+	
+})
+		it('Emits a Transfer event',async()=>{
+			//console.log(result)
+			const event=result.events[0];
+			expect(event.event).to.equal('Transfer');
+			const args=event.args;
+			//console.log(event.args);
+			expect(args.from).to.equal(deployer.address);
+			expect(args.to).to.equal(reciever.address);
+			expect(args.value).to.equal(amount);
+
+
+		})
+	})
+});
+describe('Failure',()=>{
+it('Insufficient balances',async()=>{
+	let invalidAmount=tokens(10000000);
+	await expect(token.connect(deployer).transfer(reciever.address,invalidAmount)).to.be.reverted;
+	})
+it('Invalid receiver address',async()=>{
+	let amount=tokens(100)
+	await expect(token.connect(deployer).transfer('0x0000000000000000000000000000000000000000',amount)).to.be.reverted;
+
+
+})
+
+});
+	
 	
 
 })
