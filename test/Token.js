@@ -5,8 +5,12 @@ return ethers.utils.parseUnits(n.toString(),'ether');
 }
 
 describe('Token',()=>{
-	let token,accounts,deployer,reciever
-	beforeEach(async()=>{
+	let token,
+		accounts,
+		deployer,
+		reciever
+	beforeEach(async()=>
+	{
 		const Token = await ethers.getContractFactory('Token');
 		 token = await Token.deploy('AVINASH',
 		 							'AVI',
@@ -44,23 +48,30 @@ describe('Token',()=>{
 		 })
 
 	})
-describe('Success',()=>{
-describe('Sending Token',()=>{
-		let  amount,transaction,result
-		beforeEach(async()=>{
-		amount=tokens(100);
-		transaction=await token.connect(deployer).transfer(reciever.address,amount)
-		result=await transaction.wait()
+describe('Success',()=>
+{
+describe('Sending Token',()=>
+{
+		let amount,
+			transaction,
+			result
+		beforeEach(async()=>
+		{
+		 amount=tokens(100);
+		 transaction=await token.connect(deployer).transfer(reciever.address,amount)
+		 result=await transaction.wait()
 		});
 	
 				
-		it('Transfer Token balances',async ()=>{
+		it('Transfer Token balances',async ()=>
+		{
 
-		expect(await token.balanceOf(deployer.address)).to.equal(tokens(999900))
-		expect(await token.balanceOf(reciever.address)).to.equal(amount)
+		 expect(await token.balanceOf(deployer.address)).to.equal(tokens(999900))
+		 expect(await token.balanceOf(reciever.address)).to.equal(amount)
 	
-})
-		it('Emits a Transfer event',async()=>{
+		})
+		it('Emits a Transfer event',async()=>
+		{
 			//console.log(result)
 			const event=result.events[0];
 			expect(event.event).to.equal('Transfer');
@@ -74,21 +85,27 @@ describe('Sending Token',()=>{
 		})
 	})
 });
-describe('Failure',()=>{
-it('Insufficient balances',async()=>{
-	let invalidAmount=tokens(10000000);
-	await expect(token.connect(deployer).transfer(reciever.address,invalidAmount)).to.be.reverted;
+describe('Failure',()=>
+{
+	it('Insufficient balances',async()=>
+	{
+	 let invalidAmount=tokens(10000000);
+	 await expect(token.connect(deployer).transfer(reciever.address,invalidAmount)).to.be.reverted;
 	})
-it('Invalid receiver address',async()=>{
-	let amount=tokens(100)
-	await expect(token.connect(deployer).transfer('0x0000000000000000000000000000000000000000',amount)).to.be.reverted;
+	it('Invalid receiver address',async()=>
+	{
+	 let amount=tokens(100)
+	 await expect(token.connect(deployer).transfer('0x0000000000000000000000000000000000000000',amount)).to.be.reverted;
 
 
-})
+	})
 
 });
-describe('Aprroval',()=>{
-	let  amount,transaction,result
+describe('Aprroval',()=>
+{
+	let amount,
+		transaction,
+		result
 		beforeEach(async()=>{
 		amount=tokens(100);
 		transaction=await token.connect(deployer).approve(exchange.address,amount)
