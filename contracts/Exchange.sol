@@ -193,4 +193,4 @@ contract Exchange{
 	tokens[_tokenGive][msg.sender] = tokens[_tokenGive][msg.sender] + _amountGive;
 	tokens[_tokenGive][user] = tokens[_tokenGive][user] - _amountGive;
 }
-}
+} 
