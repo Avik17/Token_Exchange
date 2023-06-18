@@ -11,7 +11,9 @@ contract Token{
 	uint256 public totalSupply ;// 1000000 x 10^18
 	mapping(address=>uint256) public balanceOf;
 	mapping(address=>mapping(address=>uint256))public allowance;
-	constructor(string memory _name,
+
+	constructor(
+				string memory _name,
 				string memory _symbol,
 		    	uint256 _totalSupply)
 	{
