@@ -6,7 +6,8 @@ import {
   loadProvider,
   loadNetwork, 
   loadAccount,
-  loadToken
+  loadTokens,
+  loadExchange
  } 
   from '../store/interactions';
 
@@ -15,11 +16,18 @@ function App() {
   const dispatch=useDispatch()
   const loadBlockchainData=async()=>{
     
-  await loadAccount(dispatch)
+  
   const provider= loadProvider(dispatch)
   const chainId=await loadNetwork(provider,dispatch)
-  await loadToken(provider,config[chainId].AVI.address,dispatch)
- 
+
+  const AVI=config[chainId].AVI
+  const mETH=config[chainId].mETH
+  const exchangeConfig=config[chainId].exchange
+  await loadAccount(provider,dispatch)
+
+  await loadTokens(provider,[AVI.address,mETH.address],dispatch)
+  await loadExchange(provider,exchangeConfig.address,dispatch)
+  
   
  
   
