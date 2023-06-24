@@ -11,6 +11,8 @@ import {
  } 
   from '../store/interactions';
 
+  import Navbar from './Navbar';
+
 
 function App() {
   const dispatch=useDispatch()
@@ -23,7 +25,13 @@ function App() {
   const AVI=config[chainId].AVI
   const mETH=config[chainId].mETH
   const exchangeConfig=config[chainId].exchange
-  await loadAccount(provider,dispatch)
+  window.ethereum.on('chainChanged',()=>{
+    window.location.reload()
+   })
+ window.ethereum.on('accountsChanged',()=>{
+  loadAccount(provider,dispatch)
+ })
+ 
 
   await loadTokens(provider,[AVI.address,mETH.address],dispatch)
   await loadExchange(provider,exchangeConfig.address,dispatch)
@@ -39,6 +47,7 @@ function App() {
     <div>
 
       {/* Navbar */}
+      <Navbar/>
 
       <main className='exchange grid'>
         <section className='exchange__section--left grid'>
