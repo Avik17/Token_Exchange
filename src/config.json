@@ -20,6 +20,12 @@
 		"explorerURL":
 			"https://mumbai.polygonscan.com/"
 		
+	},
+	"11155111":{
+
+		"explorerURL":
+			"https://sepolia.etherscan.io"
+		
 	}
 
 }

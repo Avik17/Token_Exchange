@@ -7,12 +7,15 @@ import {
   loadNetwork, 
   loadAccount,
   loadTokens,
-  loadExchange
+  loadExchange,
+  subscribeToEvents
  } 
   from '../store/interactions';
 
   import Navbar from './Navbar';
   import Markets from './Markets';
+import Balance from './Balance';
+
 
 
 function App() {
@@ -23,21 +26,22 @@ function App() {
   const provider= loadProvider(dispatch)
   const chainId=await loadNetwork(provider,dispatch)
 
-  const AVI=config[chainId].AVI
-  const mETH=config[chainId].mETH
-  const exchangeConfig=config[chainId].exchange
+ 
+  
   window.ethereum.on('chainChanged',()=>{
     window.location.reload()
    })
  window.ethereum.on('accountsChanged',()=>{
   loadAccount(provider,dispatch)
  })
- 
+ const AVI=config[chainId].AVI
+ const mETH=config[chainId].mETH
 
   await loadTokens(provider,[AVI.address,mETH.address],dispatch)
-  await loadExchange(provider,exchangeConfig.address,dispatch)
+  const exchangeConfig=config[chainId].exchange
+  const exchange=await loadExchange(provider,exchangeConfig.address,dispatch)
   
-  
+  subscribeToEvents(exchange,dispatch)
  
   
   }
@@ -57,6 +61,7 @@ function App() {
           <Markets/>
 
           {/* Balance */}
+          <Balance/>
 
           {/* Order */}
 
