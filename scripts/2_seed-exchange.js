@@ -1,126 +1,167 @@
-const config= require('../src/config.json')
-const tokens =(n)=>{
-return ethers.utils.parseUnits(n.toString(),'ether');
-}
-const wait=(seconds)=>{
-  const milliseconds = seconds * 1000
-  return new Promise(resolve => setTimeout(resolve,milliseconds))
+const config = require('../src/config.json')
+
+const tokens = (n) => {
+  return ethers.utils.parseUnits(n.toString(), 'ether')
 }
 
+const wait = (seconds) => {
+  const milliseconds = seconds * 1000
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
 
 async function main() {
-  const accounts=await ethers.getSigners()
+  // Fetch accounts from wallet - these are unlocked
+  const accounts = await ethers.getSigners()
 
-  const {chainId}=await ethers.provider.getNetwork()
-  console.log("Using ChainID : ",chainId)
+  // Fetch network
+  const { chainId } = await ethers.provider.getNetwork()
+  console.log("Using chainId:", chainId)
 
-  const avi=await ethers.getContractAt('Token',config[chainId].AVI.address)
-    console.log(`AVI fetched from :  ${avi.address}`)
+  // Fetch deployed tokens
+  const AVI = await ethers.getContractAt('Token', config[chainId].AVI.address)
+  console.log(`AVI Token fetched: ${AVI.address}\n`)
 
-     const mETH=await ethers.getContractAt('Token',config[chainId].mETH.address)
-    console.log(`mETH fetched from :  ${mETH.address}`)
+  const mETH = await ethers.getContractAt('Token', config[chainId].mETH.address)
+  console.log(`mETH Token fetched: ${mETH.address}\n`)
 
-     const mDAI=await ethers.getContractAt('Token',config[chainId].mDAI.address)
-    console.log(`mDAI fetched from :  ${mDAI.address}`)
+  const mDAI = await ethers.getContractAt('Token', config[chainId].mDAI.address)
+  console.log(`mDAI Token fetched: ${mDAI.address}\n`)
 
-    const exchange=await ethers.getContractAt('Exchange',config[chainId].exchange.address)
-    console.log(`Exchange fetched from :  ${exchange.address}`)
+  // Fetch the deployed exchange
+  const exchange = await ethers.getContractAt('Exchange', config[chainId].exchange.address)
+  console.log(`Exchange fetched: ${exchange.address}\n`)
 
-    const sender=accounts[0]
-    const receiver=accounts[1]
-    let amount=tokens(10000)
+  // Give tokens to account[1]
+  const sender = accounts[0]
+  const receiver = accounts[1]
+  let amount = tokens(10000)
 
-    let transaction,result
-    transaction=await mETH.connect(sender).transfer(receiver.address,amount)
-    result=await transaction.wait()
-    console.log(`Transferred ${amount} tokens from ${sender.address} to ${receiver.address}\n`)
+  // user1 transfers 10,000 mETH...
+  let transaction, result
+  transaction = await mETH.connect(sender).transfer(receiver.address, amount)
+  console.log(`Transferred ${amount} tokens from ${sender.address} to ${receiver.address}\n`)
 
-    const user1=accounts[0]
-    const user2=accounts[1]
-    amount=tokens(10000)
+  // Set up exchange users
+  const user1 = accounts[0]
+  const user2 = accounts[1]
+  amount = tokens(10000)
 
+  // user1 approves 10,000 AVI...
+  transaction = await AVI.connect(user1).approve(exchange.address, amount)
+  await transaction.wait()
+  console.log(`Approved ${amount} tokens from ${user1.address}`)
 
-    transaction=await avi.connect(user1).approve(exchange.address,amount)
-    await transaction.wait()
-    console.log(`Approved ${amount} tokens from ${user1.address}\n`)
+  // user1 deposits 10,000 AVI...
+  transaction = await exchange.connect(user1).depositToken(AVI.address, amount)
+  await transaction.wait()
+  console.log(`Deposited ${amount} Ether from ${user1.address}\n`)
 
-    transaction=await exchange.connect(user1).depositToken(avi.address,amount)
-    await transaction.wait()
-    console.log(`Deposited ${amount} tokens from ${user1.address}\n`)
+  // User 2 Approves mETH
+  transaction = await mETH.connect(user2).approve(exchange.address, amount)
+  await transaction.wait()
+  console.log(`Approved ${amount} tokens from ${user2.address}`)
 
-    transaction=await mETH.connect(user2).approve(exchange.address,amount)
-    await transaction.wait()
-    console.log(`Approved ${amount} tokens from ${user2.address}\n`)
+  // User 2 Deposits mETH
+  transaction = await exchange.connect(user2).depositToken(mETH.address, amount)
+  await transaction.wait()
+  console.log(`Deposited ${amount} tokens from ${user2.address}\n`)
 
-    transaction=await exchange.connect(user2).depositToken(mETH.address,amount)
-    await transaction.wait()
-    console.log(`Deposited ${amount} tokens from ${user2.address}\n`)
-  
-    let orderId
-    transaction=await exchange.connect(user1).makeOrder(avi.address,tokens(5),mETH.address,tokens(100))
-    result=await transaction.wait()
+  /////////////////////////////////////////////////////////////
+  // Seed a Cancelled Order
+  //
+
+  // User 1 makes order to get tokens
+  let orderId
+  transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(100), AVI.address, tokens(5))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 1 cancels order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user1).cancelOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Cancelled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  /////////////////////////////////////////////////////////////
+  // Seed Filled Orders
+  //
+
+  // User 1 makes order
+  transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(100), AVI.address, tokens(10))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 2 fills order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user2).fillOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Filled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  // User 1 makes another order
+  transaction = await exchange.makeOrder(mETH.address, tokens(50), AVI.address, tokens(15))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 2 fills another order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user2).fillOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Filled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  // User 1 makes final order
+  transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(200), AVI.address, tokens(20))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 2 fills final order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user2).fillOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Filled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  /////////////////////////////////////////////////////////////
+  // Seed Open Orders
+  //
+
+  // User 1 makes 10 orders
+  for(let i = 1; i <= 10; i++) {
+    transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(10 * i), AVI.address, tokens(10))
+    result = await transaction.wait()
+
     console.log(`Made order from ${user1.address}`)
 
-    orderId=result.events[0].args.orderCount
-    transaction=await exchange.connect(user1).cancelOrder(orderId)
-    result=await transaction.wait()
-    console.log(`Canceled order from ${user1.address}\n`)
+    // Wait 1 second
     await wait(1)
+  }
 
-    transaction=await exchange.connect(user1).makeOrder(avi.address,tokens(10),mETH.address,tokens(100))
-    result=await transaction.wait()
-    console.log(`Made order from ${user1.address}`)
+  // User 2 makes 10 orders
+  for (let i = 1; i <= 10; i++) {
+    transaction = await exchange.connect(user2).makeOrder(AVI.address, tokens(10), mETH.address, tokens(10 * i))
+    result = await transaction.wait()
 
- orderId=result.events[0].args.orderCount
-    transaction=await exchange.connect(user2).fillOrder(orderId)
-    result=await transaction.wait()
-    console.log(`Filled order from ${user2.address}\n`)
-
-    await wait(1)
-     transaction=await exchange.connect(user1).makeOrder(avi.address,tokens(15),mETH.address,tokens(50))
-    result=await transaction.wait()
-    console.log(`Made order from ${user1.address}`)
-
-      orderId=result.events[0].args.orderCount
-    transaction=await exchange.connect(user2).fillOrder(orderId)
-    result=await transaction.wait()
-    console.log(`Filled order from ${user2.address}\n`)
-
-    await wait(1)
-
-     transaction=await exchange.connect(user1).makeOrder(avi.address,tokens(20),mETH.address,tokens(200))
-    result=await transaction.wait()
-    console.log(`Made order from ${user1.address}`)
-
-      orderId=result.events[0].args.orderCount
-    transaction=await exchange.connect(user2).fillOrder(orderId)
-    result=await transaction.wait()
-    console.log(`Filled order from ${user2.address}\n`)
-
-    await wait(1)
-
-    for (let i = 1; i <=10; i++) {
-      transaction=await exchange.connect(user1).makeOrder(avi.address,tokens(10),mETH.address,tokens(10*i))
-    result=await transaction.wait()
-    console.log(`Made order from ${user1.address}`)
-    await wait(1)
-    }
-      for (let i = 1; i <=10; i++) {
-      transaction=await exchange.connect(user2).makeOrder(mETH.address,tokens(10*i),avi.address,tokens(10))
-    result=await transaction.wait()
     console.log(`Made order from ${user2.address}`)
-    await wait(1)
-    }
 
+    // Wait 1 second
+    await wait(1)
+  }
 
 }
 
-
-
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

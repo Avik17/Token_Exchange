@@ -12,7 +12,7 @@ describe('Token',()=>{
 	beforeEach(async()=>
 	{
 		const Token = await ethers.getContractFactory('Token');
-		 token = await Token.deploy('AVINASH',
+		 token = await Token.deploy('Avi',
 		 							'AVI',
 		 							'1000000');
 		 accounts=await ethers.getSigners()
@@ -21,7 +21,7 @@ describe('Token',()=>{
 		 exchange=accounts[2]
 	})
 	describe('Deployment',()=>{
-		const name='AVINASH'
+		const name='Avi'
 		const symbol='AVI'
 		const decimals='18'
 		const totalSupply=tokens('1000000')

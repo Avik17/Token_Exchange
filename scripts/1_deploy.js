@@ -10,7 +10,7 @@ async function main() {
   
 
   const avi = await Token.deploy(
-                  'AVINASH',
+                  'Avi',
                   'AVI',
                   '1000000');
   await avi.deployed()
