@@ -19,8 +19,8 @@ const openOrders = state => {
   const cancelled = cancelledOrders(state)
 
   const openOrders = reject(all, (order) => {
-    const orderFilled = filled.some((o) => o.id=== order.id)
-    const orderCancelled = cancelled.some((o) => o.id === order.id)
+    const orderFilled = filled.some((o) => o.id.toString()=== order.id.toString())
+    const orderCancelled = cancelled.some((o) => o.id.toString() === order.id.toString())
     return(orderFilled || orderCancelled)
   })
 
