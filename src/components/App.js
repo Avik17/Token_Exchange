@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import config from '../config.json';
@@ -21,6 +20,7 @@ import OrderBook from './OrderBook';
 import PriceChart from './PriceChart';
 import Trades from './Trades';
 import Transactions from './Transactions';
+import Alert from './Alert';
 
 
 
@@ -59,36 +59,35 @@ function App() {
   return (
     <div>
 
-      {/* Navbar */}
+    
       <Navbar/>
 
       <main className='exchange grid'>
         <section className='exchange__section--left grid'>
 
-          {/* Markets */}
+        
           <Markets/>
 
-          {/* Balance */}
+        
           <Balance/>
 
-          {/* Order */}
+       
           <Order/>
 
         </section>
         <section className='exchange__section--right grid'>
-
-          {/* PriceChart */}
+          
             <PriceChart/>
-          {/* Transactions */}
+    
           <Transactions/>
-          {/* Trades */}
+          
           <Trades/>
-          {/* OrderBook */}
+
          <OrderBook/>
         </section>
       </main>
-
-      {/* Alert */}
+     <Alert/>
+     
 
     </div>
   );

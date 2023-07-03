@@ -5,7 +5,6 @@ import logo from '../assets/logo.png'
 import eth from '../assets/eth.svg'
 
 import { loadAccount } from '../store/interactions'
-
 import config from '../config.json';
 
 const Navbar = () => {
@@ -30,7 +29,7 @@ const Navbar = () => {
   return(
     <div className='exchange__header grid'>
       <div className='exchange__header--brand flex'>
-        <img src={logo} className="logo" alt="DApp Logo"></img>
+        <img src={logo} className="logo" alt="AVI Logo"></img>
         <h1>AVI Token Exchange</h1>
       </div>
 
@@ -41,8 +40,7 @@ const Navbar = () => {
           <select name="networks" id="networks" value={config[chainId] ? `0x${chainId.toString(16)}` : `0`} onChange={networkHandler}>
             <option value="0" disabled>Select Network</option>
             <option value="0x7A69">Localhost</option>
-            <option value="0x13881">Mumbai</option>
-            <option value="0xaa36a7">Sepolia</option>
+            {/* <option value="0x2a">Kovan</option> */}
           </select>
         )}
 
