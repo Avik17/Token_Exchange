@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import Blockies from 'react-blockies'
 
-import logo from '../assets/logo.png'
+//import logo from '../assets/logo.png'
 import eth from '../assets/eth.svg'
 
 import { loadAccount } from '../store/interactions'
@@ -29,8 +29,8 @@ const Navbar = () => {
   return(
     <div className='exchange__header grid'>
       <div className='exchange__header--brand flex'>
-        <img src={logo} className="logo" alt="AVI Logo"></img>
-        <h1>AVI Token Exchange</h1>
+        <img src="https://i.ibb.co/LRqJ1cX/eth.png" className="logo" alt="AVI Logo"></img>
+        <h1 className='heading'>AVI Token Exchange</h1>
       </div>
 
       <div className='exchange__header--networks flex'>
@@ -38,9 +38,10 @@ const Navbar = () => {
 
         {chainId && (
           <select name="networks" id="networks" value={config[chainId] ? `0x${chainId.toString(16)}` : `0`} onChange={networkHandler}>
-            <option value="0" disabled>Select Network</option>
-            <option value="0x7A69">Localhost</option>
-            {/* <option value="0x2a">Kovan</option> */}
+            <option value="0" disabled id='select-network'><h2>Select Network</h2></option>
+            <option value="0x7A69"><h3>Localhost</h3></option>
+             <option value="0xaa36a7"><h3>Sepolia</h3></option> 
+             <option value="0x13881"><h3>Polygon-Mumbai</h3></option> 
           </select>
         )}
 

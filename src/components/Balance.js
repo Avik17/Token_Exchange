@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import avi from '../assets/avi.svg'
+//import avi from '../assets/avi.svg'
 import { useEffect, useRef, useState } from 'react';
 import { loadBalances,transferTokens } from '../store/interactions';
 import eth from '../assets/eth.svg'
@@ -90,7 +90,7 @@ return (
   
         <div className='exchange__transfers--form'>
           <div className='flex-between'>
-          <p><small>Token</small><br/><img src={avi} alt="Token logo"></img>{symbols && symbols[0]}</p>
+          <p><small>Token</small><br/><img className='logoavi' src={eth} border="0"  alt="Token logo"></img>{symbols && symbols[0]}</p>
           <p><small>Wallet</small><br/>{tokenBalances && tokenBalances[0]}</p>
           <p><small>Exchange</small><br/>{exchangeBalances && exchangeBalances[0]}</p>
           </div>

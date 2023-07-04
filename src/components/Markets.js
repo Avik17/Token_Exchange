@@ -19,7 +19,7 @@ const Markets = () => {
       </div>
 
       {chainId && config[chainId] ? (
-        <select name="markets" id="markets" onChange={marketHandler}>
+        <select name="markets" id="markets"  onChange={marketHandler}>
           <option value={`${config[chainId].AVI.address},${config[chainId].mETH.address}`}>AVI / mETH</option>
           <option value={`${config[chainId].AVI.address},${config[chainId].mDAI.address}`}>AVI / mDAI</option>
         </select>
