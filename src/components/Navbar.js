@@ -30,7 +30,7 @@ const Navbar = () => {
     <div className='exchange__header grid'>
       <div className='exchange__header--brand flex'>
         <img src="https://i.ibb.co/LRqJ1cX/eth.png" className="logo" alt="AVI Logo"></img>
-        <h1 className='heading'>AVI Token Exchange</h1>
+        <h1 className='heading'>AVI TokenSwap</h1>
       </div>
 
       <div className='exchange__header--networks flex'>
