@@ -30,7 +30,7 @@
 		},
 	
 		"explorerURL":
-			"https://mumbai.polygonscan.com"
+			"https://polygonscan.com/"
 		
 	},
 	"11155111":{
@@ -47,7 +47,7 @@
 			"address":"0x6011258e113B59f8D2F44AaB2d998F71D0F9aE7D"
 		},
 		"explorerURL":
-			"https://sepolia.etherscan.io"
+			"https://sepolia.etherscan.io/"
 		
 	}
 
